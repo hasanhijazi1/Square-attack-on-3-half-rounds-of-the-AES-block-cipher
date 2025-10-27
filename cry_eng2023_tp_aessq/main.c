@@ -9,11 +9,18 @@
 */
 #define random_oracle 0 // Set by challenger
 
-uint8_t ekey[AES_128_KEY_SIZE] = { // Encryption key set by challenger
-    43, 126, 21, 22,
-    40, 174, 210, 166,
-    171, 247, 151, 103,
-    152, 72, 60, 79
+uint8_t ekey1[AES_128_KEY_SIZE] = { // Encryption key set by challenger
+    43, 113, 41, 39,
+    80, 74, 21, 16,
+    11, 247, 50, 13,
+    156, 72, 77, 9
+};
+
+uint8_t ekey2[AES_128_KEY_SIZE] = { // Encryption key set by challenger on F PRP game
+    1, 101, 199, 250,
+    5, 63, 123, 188,
+    11, 22, 164, 234,
+    50, 100, 150, 200
 };
 
 
@@ -34,7 +41,12 @@ void keyed_function(uint8_t* block, const uint8_t* key, const uint8_t* key2)
 
 void oracle(uint8_t* block) {
     if (random_oracle) for (int i = 0; i < AES_BLOCK_SIZE; i++) block[i] = rand() % 256; // Random oracle
-    else aes128_enc(block, ekey, 3, 1); // 3-full-round AES encryption
+    else aes128_enc(block, ekey1, 3, 1); // 3-full-round AES encryption
+}
+
+void oraclef(uint8_t* block) {
+    if (random_oracle) for (int i = 0; i < AES_BLOCK_SIZE; i++) block[i] = rand() % 256; // Random oracle
+    else keyed_function(block, ekey1, ekey2); // 3-full-round AES encryption
 }
 
 void challenger_e(uint8_t* block) {
@@ -44,6 +56,16 @@ void challenger_e(uint8_t* block) {
     } else {
         printf("Challenger using E(•)\n");
         oracle(block);
+    }
+}
+
+void challenger_f(uint8_t* block) {
+    if (random_oracle) {
+        printf("Challenger using random oracle\n");
+        oraclef(block);
+    } else {
+        printf("Challenger using F(•)\n");
+        oraclef(block);
     }
 }
 
@@ -100,8 +122,63 @@ void distinguisher_e(){
     }
 }
 
+void distinguisher_f(){
+
+    uint8_t plaintexts[256][AES_BLOCK_SIZE];
+    uint8_t ciphers[256][AES_BLOCK_SIZE];
+
+    // Creation of plain texts
+    for (int i = 0; i < 256; i++) {
+        plaintexts[i][0] = i;
+        ciphers[i][0] = i;
+
+        for (int j = 1; j < AES_BLOCK_SIZE; j++){
+            plaintexts[i][j] = 0;
+            ciphers[i][j] = 0;
+        }
+    }
+
+    // Chooses a messages to be sent to the challenger from the set of plaintexts
+    int chosen_message_index = rand() % 256;
+    uint8_t* m1 = ciphers[chosen_message_index];
+
+    // Sends the messages to the challenger and receives the ciphertexts
+    challenger_f(m1);
+
+    // Encrypt all plaintexts with 3-full-round
+    for (int i = 0; i < 256; i++){
+        if (i == chosen_message_index) continue;
+        oraclef(ciphers[i]);
+    }
+
+    // XOR all ciphertexts
+    uint8_t xor_result[AES_BLOCK_SIZE] = {0};
+    for (int i = 0; i < 256; i++) {
+        for (int j = 0; j < AES_BLOCK_SIZE; j++) {
+            xor_result[j] ^= ciphers[i][j];
+        }
+    }
+
+    // Check if the result is all zero
+    int is_all_zero = 1;
+    for (int i = 0; i < AES_BLOCK_SIZE; i++)
+        if (xor_result[i] != 0) {
+            is_all_zero = 0;
+            break;
+        }
+
+    // Simply output the result
+    if (is_all_zero) {
+        printf("Distinguisher: The oracle is F(•).\n");
+    } else {
+        printf("Distinguisher: The oracle is a random oracle.\n");
+    }
+}
+
+
 int test_distinguisher() {
     distinguisher_e();
+    distinguisher_f();
     return 0;
 }
 
