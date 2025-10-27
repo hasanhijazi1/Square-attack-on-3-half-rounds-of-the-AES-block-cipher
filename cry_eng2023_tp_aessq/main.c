@@ -382,16 +382,16 @@ void attack(){
     // Intersection of candidates (between both lambda-set)to find the last round key
     uint8_t recovered_round_key[AES_128_KEY_SIZE];
     
-    for (int j = 0; j < AES_128_KEY_SIZE; j++){
+    for (int b = 0; b < AES_128_KEY_SIZE; b++) {
         int found = 0;
         
         for (int i = 0; i < 256; i++){
-            if (guessed_key1[i][j] == -1) break;
+            if (guessed_key1[i][b] == -1) break;
 
             for (int k = 0; k < 256; k++){
-                if (guessed_key2[k][j] == -1) break;
+                if (guessed_key2[k][b] == -1) break;
 
-                if (guessed_key1[i][j] == guessed_key2[k][j]){
+                if (guessed_key1[i][b] == guessed_key2[k][j]){
                     recovered_round_key[j] = guessed_key1[i][j];
                     found = 1;
                     break;
