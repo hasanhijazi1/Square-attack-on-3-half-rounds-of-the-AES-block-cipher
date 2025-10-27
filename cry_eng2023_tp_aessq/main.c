@@ -445,6 +445,7 @@ int main(){
     printf("\n\n");
 
     printf("Performing attack on 3 1/2 round AES-128:\n");
+    //TODO: Must create a random key from urandom and pass as parameter
     attack();
     return 0;
 }
