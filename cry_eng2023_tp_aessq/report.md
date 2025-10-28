@@ -1,3 +1,4 @@
+
 Q1 - The `xtime` function is a multiplication of a polynomial `p`by `x` reduced by modulo an irreducible polynomial of deg 8, such as X^8 + X^4 + X^3 + X + 1 (0x11B = 283). It is written as a left shift and a conditional XOR with 0x1b.
 
 Example 1
@@ -29,11 +30,30 @@ Proof of correctness: Regardless of the input polynomial p (conditioned that p f
 
 p is of the form aX^8 + bX^7+ cX^6 + dX^5 + eX^4 + fX^3 + gX^2 + hX + i, where {a,b,c,d,e,f,g,h,i} \in {0,1}
 
-We have two possibility for the most valuable bit of p: it is either 0 or 1. If 0, we know for a fact that the result is already reduced to a degree < 8 as we only increase the degree of p by one. Thus as 
+We have two possibility for the most valuable bit of p: it is either 0 or 1. If 0, we know for a fact that the result is already reduced to a degree < 8 as we only increase the degree of p by one. Furthermore, we now that if the MSB of p (call it p_7) is 0:
 
+```c
+m = p >> 7; // Result in m = 0
 
-To implement the function modulo X^8 + X^6 + X^5 + X^4 + X^3 + X + 1 (0x17B = 379)
+m ^= 1; // Result is m = 1
+m -= 1; // Result is m = 0
+m &= 0x1B; // Result is m = 0
 
+((p << 1) ^ m); // Result is p << 1, which is the same as a simple left shift.
+
+```
+
+On the other hand, if p_7 is 1, we have:
+```c
+m = p >> 7; // Result in m = 1
+
+m ^= 1; // Result is m = 0
+m -= 1; // Result is m = 0xFF
+m &= 0x1B; // Result is m = 0x1B
+
+((p << 1) ^ m); // Result is (p << 1) ^ 0x1B, which is the same as a simple left shift followed by a reduction by 0x1B.
+```
+As a result of the operation (p<<1) for p_7 == 1 is an overflow of p_7 which is now X^8, which is congruent to 0x1B mod m, so the reduction is correct.
 
 
 
