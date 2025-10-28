@@ -465,5 +465,8 @@ int main(){
     printf("Performing attack on 3 1/2 round AES-128:\n");
     memcpy(ekey1, key, AES_128_KEY_SIZE); // Set the key for the oracle
     attack();
+
+
+    print("End of tests.\n");
     return 0;
 }
