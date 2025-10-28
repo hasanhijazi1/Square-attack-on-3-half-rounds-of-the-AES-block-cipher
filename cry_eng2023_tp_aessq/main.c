@@ -9,20 +9,12 @@
 */
 #define random_oracle 0 // Set by challenger
 
-// uint8_t ekey1[AES_128_KEY_SIZE] = { // Encryption key set by challenger
-//     43, 113, 41, 39,
-//     80, 74, 21, 16,
-//     11, 247, 50, 13,
-//     156, 72, 77, 9
-// };
-
 uint8_t ekey1[AES_128_KEY_SIZE] = { // Encryption key set by challenger
-    1, 2, 3, 4,
-    5, 6, 7, 8,
-    9, 10, 11, 12,
-    13, 14, 15, 16
+    43, 113, 41, 39,
+    80, 74, 21, 16,
+    11, 247, 50, 13,
+    156, 72, 77, 9
 };
-
 
 uint8_t ekey2[AES_128_KEY_SIZE] = { // Encryption key set by challenger on F PRP game
     1, 101, 199, 250,
@@ -31,6 +23,24 @@ uint8_t ekey2[AES_128_KEY_SIZE] = { // Encryption key set by challenger on F PRP
     50, 100, 150, 200
 };
 
+
+// Load n bytes from /dev/urandom
+void genkey(uint8_t* key, int n) {
+    FILE* urandom = fopen("/dev/urandom","rb");
+
+    if (urandom == NULL) {
+        perror("Failed to open /dev/urandom");
+        exit(EXIT_FAILURE);
+    }
+
+    size_t bytes = fread(key, sizeof(uint8_t), n, urandom);
+    if (bytes != n) {
+        perror("Failed to load enough random bytes.");
+        exit(EXIT_FAILURE);
+    }
+    
+    fclose(urandom);
+}
 
 void keyed_function(uint8_t* block, const uint8_t* key, const uint8_t* key2)
 {
@@ -391,8 +401,8 @@ void attack(){
             for (int k = 0; k < 256; k++){
                 if (guessed_key2[k][b] == -1) break;
 
-                if (guessed_key1[i][b] == guessed_key2[k][j]){
-                    recovered_round_key[j] = guessed_key1[i][j];
+                if (guessed_key1[i][b] == guessed_key2[k][b]){
+                    recovered_round_key[b] = guessed_key1[i][b];
                     found = 1;
                     break;
                 }
@@ -444,8 +454,16 @@ int main(){
 
     printf("\n\n");
 
+    uint8_t key[AES_128_KEY_SIZE];
+    genkey(key, AES_128_KEY_SIZE);
+    printf("Randomly generated key for the attack:\n");
+    for (int i = 0; i < AES_128_KEY_SIZE; i++){
+        printf("%3d ", key[i]);
+    }
+    printf("\n");
+
     printf("Performing attack on 3 1/2 round AES-128:\n");
-    //TODO: Must create a random key from urandom and pass as parameter
+    memcpy(ekey1, key, AES_128_KEY_SIZE); // Set the key for the oracle
     attack();
     return 0;
 }
