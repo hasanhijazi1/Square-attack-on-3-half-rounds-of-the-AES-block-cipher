@@ -1,0 +1,60 @@
+
+Testing round key generation:
+Round Key 0: 43 126 21 22 40 174 210 166 171 247 151 103 152 72 60 79 
+Round Key 1: 120 149 145 80 80 59 67 246 251 204 212 145 99 132 232 222 
+Round Key 2: 37 14 140 171 117 53 207 93 142 249 27 204 237 125 243 18 
+Round Key 3: 222 3 69 254 171 54 138 163 37 207 145 111 200 178 98 125 
+Round Key 4: 225 169 186 22 74 159 48 181 111 80 161 218 167 226 195 167 
+Round Key 5: 105 135 230 74 35 24 214 255 76 72 119 37 235 170 180 130 
+Round Key 6: 229 10 245 163 198 18 35 92 138 90 84 121 97 240 224 251 
+Round Key 7: 41 235 250 76 239 249 217 16 101 163 141 105 4 83 109 146 
+Round Key 8: 68 215 181 190 171 46 108 174 206 141 225 199 202 222 140 85 
+Round Key 9: 66 179 73 202 233 157 37 100 39 16 196 163 237 206 72 246 
+Round Key 10: 255 225 11 159 22 124 46 251 49 108 234 88 220 162 162 174 
+
+Previous Round Key 0: 43 126 21 22 40 174 210 166 171 247 151 103 152 72 60 79 
+Previous Round Key 1: 120 149 145 80 80 59 67 246 251 204 212 145 99 132 232 222 
+Previous Round Key 2: 37 14 140 171 117 53 207 93 142 249 27 204 237 125 243 18 
+Previous Round Key 3: 222 3 69 254 171 54 138 163 37 207 145 111 200 178 98 125 
+Previous Round Key 4: 225 169 186 22 74 159 48 181 111 80 161 218 167 226 195 167 
+Previous Round Key 5: 105 135 230 74 35 24 214 255 76 72 119 37 235 170 180 130 
+Previous Round Key 6: 229 10 245 163 198 18 35 92 138 90 84 121 97 240 224 251 
+Previous Round Key 7: 41 235 250 76 239 249 217 16 101 163 141 105 4 83 109 146 
+Previous Round Key 8: 68 215 181 190 171 46 108 174 206 141 225 199 202 222 140 85 
+Previous Round Key 9: 66 179 73 202 233 157 37 100 39 16 196 163 237 206 72 246 
+
+Previous Round Key 0 matches original Round Key 0
+Previous Round Key 1 matches original Round Key 1
+Previous Round Key 2 matches original Round Key 2
+Previous Round Key 3 matches original Round Key 3
+Previous Round Key 4 matches original Round Key 4
+Previous Round Key 5 matches original Round Key 5
+Previous Round Key 6 matches original Round Key 6
+Previous Round Key 7 matches original Round Key 7
+Previous Round Key 8 matches original Round Key 8
+Previous Round Key 9 matches original Round Key 9
+
+
+Testing keyed function:
+Message before keyed function:
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 
+Encrypted block:
+179 85 99 167 33 235 246 247 155 46 0 98 29 12 150 149 
+
+
+Testing distinguisher:
+Challenger using E(•)
+Distinguisher: The oracle is E(•).
+Challenger using F(•)
+Distinguisher: The oracle is F(•).
+
+
+Randomly generated key for the attack:
+194  87  41  81  33  51 215 119 209  32 215   6 139  13 164  70 
+Performing attack on 3 1/2 round AES-128:
+
+Recovered 4th round key bytes (intersection):
+114 152 107 101  71  99  33  97 214 168 246 167 140  83 107 248 
+
+Recovered original key bytes:
+194  87  41  81  33  51 215 119 209  32 215   6 139  13 164  70 
