@@ -172,3 +172,72 @@ void aes128_enc(uint8_t block[AES_BLOCK_SIZE], const uint8_t key[AES_128_KEY_SIZ
         aes_round(block, ekey + nk, 16);
     }
 }
+
+
+int test_round_keys(){
+    uint8_t key[16] = {
+        43, 126, 21, 22,
+        40, 174, 210, 166,
+        171, 247, 151, 103,
+        152, 72, 60, 79
+    };
+
+    uint8_t round_keys[11][16];
+    uint8_t prev_keys[11][16];
+    int i;
+
+    // Generate round keys
+    for (i = 0; i < 16; i++) {
+        round_keys[0][i] = key[i];
+    }
+
+    for (i = 0; i < 10; i++) {
+        next_aes128_round_key(round_keys[i], round_keys[i + 1], i);
+    }
+
+     // Print round keys
+     for (i = 0; i <= 10; i++) {
+        printf("Round Key %d: ", i);
+        for (int j = 0; j < 16; j++) {
+            printf("%d ", round_keys[i][j]);
+        }
+        printf("\n");
+    }
+
+    printf("\n");
+
+    //  Generate previous round keys from the last round key
+    for (i = 10; i > 0; i--) {
+         prev_aes128_round_key(round_keys[i], prev_keys[i - 1], i - 1);
+    }
+
+    // Print previous round keys
+    for (i = 0; i < 10; i++) {
+        printf("Previous Round Key %d: ", i);
+        for (int j = 0; j < 16; j++) {
+            printf("%d ", prev_keys[i][j]);
+        }
+        printf("\n");
+    }
+
+    printf("\n");
+
+    // Compare generated previous keys with original round keys
+    for (i = 0; i < 10; i++) {
+        int match = 1;
+        for (int j = 0; j < 16; j++) {
+            if (prev_keys[i][j] != round_keys[i][j]) {
+                match = 0;
+                break;
+            }
+        }
+        if (match) {
+            printf("Previous Round Key %d matches original Round Key %d\n", i, i);
+        } else {
+            printf("Previous Round Key %d does NOT match original Round Key %d\n", i, i);
+        }
+    }
+
+
+    return 0;
+}

@@ -1,12 +1,15 @@
 #include <stdint.h>
+#include <stdio.h>
 #define AES_BLOCK_SIZE 16
 #define AES_128_KEY_SIZE 16
 
 #ifndef __AES_128_ENC__H__
 #define __AES_128_ENC__H__
 
+
+
 // Exposed just for testing purposes
-void next_aes128_round_key(const uint8_t prev_key[16], uint8_t next_key[16], int round);
+int test_round_keys();
 
 /*
  * Encrypt @block with @key over @nrounds. If @lastfull is true, the last round includes MixColumn, otherwise it doesn't.
