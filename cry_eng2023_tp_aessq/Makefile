@@ -22,30 +22,30 @@ BIN := aes
 all: $(BIN)
 
 $(BIN): $(OBJS)
-    $(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS)
 
 %.o: %.c
-    $(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Convenience target: rebuild everything
 rebuild: clean all
 
 # Run examples
 run: $(BIN)
-    ./$(BIN)
+	./$(BIN)
 
 run-random: $(BIN)
-    ./$(BIN) random
+	./$(BIN) random
 
 # Clean build artifacts
 clean:
-    rm -f $(OBJS) $(BIN)
+	rm -f $(OBJS) $(BIN)
 
 # Show available targets
 help:
-    @echo "Targets:"
-    @echo "  all          - Build $(BIN) (default)"
-    @echo "  run          - Run ./$(BIN)"
-    @echo "  run-random   - Run ./$(BIN) random"
-    @echo "  rebuild      - Clean and build"
-    @echo "  clean        - Remove objects and binary"
+	@echo "Targets:"
+	@echo "  all          - Build $(BIN) (default)"
+	@echo "  run          - Run ./$(BIN)"
+	@echo "  run-random   - Run ./$(BIN) random"
+	@echo "  rebuild      - Clean and build"
+	@echo "  clean        - Remove objects and binary"
