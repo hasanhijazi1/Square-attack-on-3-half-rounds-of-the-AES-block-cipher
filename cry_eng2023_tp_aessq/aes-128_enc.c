@@ -5,7 +5,23 @@
  * Constant-time XTIME
  */
 
+
 #include "aes-128_enc.h"
+uint8_t S_new[256];
+uint8_t Sinv_new[256];
+
+void make_new_sbox(uint8_t K)
+{
+    // Build new S-box by XORing each output with K
+    for (int i = 0; i < 256; ++i) {
+        S_new[i] = S[i] ^ K;
+    }
+
+    // Build inverse: Sinv_new[y] = Sinv[y ^ K]
+    for (int y = 0; y < 256; ++y) {
+        Sinv_new[y] = Sinv[y ^ K];
+    }
+}
 
 /*
  * Constant-time ``broadcast-based'' multiplication by $a$ in $F_2[X]/X^8 + X^4 + X^3 + X + 1$
@@ -50,29 +66,29 @@ void aes_round(uint8_t block[AES_BLOCK_SIZE], uint8_t round_key[AES_BLOCK_SIZE],
      * SubBytes + ShiftRow
      */
     /* Row 0 */
-    block[ 0] = S[block[ 0]];
-    block[ 4] = S[block[ 4]];
-    block[ 8] = S[block[ 8]];
-    block[12] = S[block[12]];
+    block[ 0] = S_new[block[ 0]];
+    block[ 4] = S_new[block[ 4]];
+    block[ 8] = S_new[block[ 8]];
+    block[12] = S_new[block[12]];
     /* Row 1 */
     tmp = block[1];
-    block[ 1] = S[block[ 5]];
-    block[ 5] = S[block[ 9]];
-    block[ 9] = S[block[13]];
-    block[13] = S[tmp];
+    block[ 1] = S_new[block[ 5]];
+    block[ 5] = S_new[block[ 9]];
+    block[ 9] = S_new[block[13]];
+    block[13] = S_new[tmp];
     /* Row 2 */
     tmp = block[2];
-    block[ 2] = S[block[10]];
-    block[10] = S[tmp];
+    block[ 2] = S_new[block[10]];
+    block[10] = S_new[tmp];
     tmp = block[6];
-    block[ 6] = S[block[14]];
-    block[14] = S[tmp];
+    block[ 6] = S_new[block[14]];
+    block[14] = S_new[tmp];
     /* Row 3 */
     tmp = block[15];
-    block[15] = S[block[11]];
-    block[11] = S[block[ 7]];
-    block[ 7] = S[block[ 3]];
-    block[ 3] = S[tmp];
+    block[15] = S_new[block[11]];
+    block[11] = S_new[block[ 7]];
+    block[ 7] = S_new[block[ 3]];
+    block[ 3] = S_new[tmp];
 
     /*
      * MixColumns
@@ -83,10 +99,10 @@ void aes_round(uint8_t block[AES_BLOCK_SIZE], uint8_t round_key[AES_BLOCK_SIZE],
         uint8_t tmp2 = column[0];
         tmp = column[0] ^ column[1] ^ column[2] ^ column[3];
 
-        column[0] ^= tmp ^ xtime(column[0] ^ column[1]);
-        column[1] ^= tmp ^ xtime(column[1] ^ column[2]);
-        column[2] ^= tmp ^ xtime(column[2] ^ column[3]);
-        column[3] ^= tmp ^ xtime(column[3] ^ tmp2);
+        column[0] ^= tmp ^ xtime(column[3] ^ column[2]);
+        column[1] ^= tmp ^ xtime(column[2] ^ column[1]);
+        column[2] ^= tmp ^ xtime(column[1] ^ column[0]);
+        column[3] ^= tmp ^ xtime(column[0] ^ tmp2);
     }
 
     /*
@@ -107,10 +123,10 @@ void next_aes128_round_key(const uint8_t prev_key[16], uint8_t next_key[16], int
 {
     int i;
 
-    next_key[0] = prev_key[0] ^ S[prev_key[13]] ^ RC[round];
-    next_key[1] = prev_key[1] ^ S[prev_key[14]];
-    next_key[2] = prev_key[2] ^ S[prev_key[15]];
-    next_key[3] = prev_key[3] ^ S[prev_key[12]];
+    next_key[0] = prev_key[0] ^ S_new[prev_key[13]] ^ RC[round];
+    next_key[1] = prev_key[1] ^ S_new[prev_key[14]];
+    next_key[2] = prev_key[2] ^ S_new[prev_key[15]];
+    next_key[3] = prev_key[3] ^ S_new[prev_key[12]];
 
     for (i = 4; i < 16; i++)
     {
@@ -132,10 +148,10 @@ void prev_aes128_round_key(const uint8_t next_key[16], uint8_t prev_key[16], int
         prev_key[i] = next_key[i] ^ next_key[i - 4];
     }
     
-    prev_key[0] = next_key[0] ^ S[prev_key[13]] ^ RC[round];
-    prev_key[1] = next_key[1] ^ S[prev_key[14]];
-    prev_key[2] = next_key[2] ^ S[prev_key[15]];
-    prev_key[3] = next_key[3] ^ S[prev_key[12]];
+    prev_key[0] = next_key[0] ^ S_new[prev_key[13]] ^ RC[round];
+    prev_key[1] = next_key[1] ^ S_new[prev_key[14]];
+    prev_key[2] = next_key[2] ^ S_new[prev_key[15]];
+    prev_key[3] = next_key[3] ^ S_new[prev_key[12]];
 }
 
 /*

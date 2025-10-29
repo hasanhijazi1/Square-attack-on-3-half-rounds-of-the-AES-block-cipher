@@ -8,12 +8,12 @@
 #include "attack.h"
 #include "keyd-function.h"
 
-
 /**
  * Program to test AES-128 encryption and decryption round key generation
-*/
+ */
 
-int main(int argc, char* argv[]){
+int main(int argc, char *argv[])
+{
 
     // Set the oracle type based on command line argument
     if (argc > 1) {
@@ -28,7 +28,7 @@ int main(int argc, char* argv[]){
         random_oracle = 0;
         printf("Using E(•)/F(•) oracle for the tests.\n\n");
     }
-
+make_new_sbox(0xA5);
     // Perform tests
     printf("-> Testing round key generation:\n");
     test_round_keys();
@@ -56,8 +56,7 @@ int main(int argc, char* argv[]){
     printf("-> Performing attack on 3 1/2 round AES-128:\n");
     memcpy(ekey1, key, AES_128_KEY_SIZE); // Set the key for the oracle
     attack();
-
-
-    printf("*** End of tests ***\n");
     return 0;
+
+    
 }

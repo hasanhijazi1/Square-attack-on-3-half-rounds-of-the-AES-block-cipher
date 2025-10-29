@@ -1,7 +1,9 @@
 #include "attack.h"
+#include "aes-128_enc.h"
 
 void three_half_oracle(uint8_t* block){
     aes128_enc(block, ekey1, 4, 0);
+    
 }
 
 void fill_candidates(int candidates[256][AES_128_KEY_SIZE], uint8_t ciphers[256][AES_BLOCK_SIZE]){
@@ -23,7 +25,7 @@ void fill_candidates(int candidates[256][AES_128_KEY_SIZE], uint8_t ciphers[256]
                 uint8_t tmp = ciphers[i][idx]^guess;
                 
                 // Inverse ShiftRow and Inverse SubBytes
-                tmp = Sinv[tmp];
+                tmp = Sinv_new[tmp];
                 xor ^= tmp;
             }
 
